@@ -23,16 +23,18 @@ class FinalidadeTransformer extends TransformerAbstract
     public function transform(Finalidade $model)
     {
         return [
-            'id'         => (int) $model->id,
-            'parent_id'         => (int) $model->parent_id,
-            'titulo'         => (string) $model->titulo,
+            'id' => (int)$model->id,
+            'parent_id' => (int)$model->parent_id,
+            'titulo' => (string)$model->titulo,
+            'bloqueado' => (boolean)$model->bloqueado,
             'created_at' => $model->created_at,
             'updated_at' => $model->updated_at
         ];
     }
 
-    public function includeCaracteristicas(Finalidade $model){
-        if(is_null($model->caracteristicas)){
+    public function includeCaracteristicas(Finalidade $model)
+    {
+        if (is_null($model->caracteristicas)) {
             return null;
         }
         return $this->collection($model->caracteristicas, new CaracteristicaTransformer());

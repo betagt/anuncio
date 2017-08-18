@@ -10,7 +10,7 @@ class Finalidade extends Model implements Transformable
 {
     use TransformableTrait;
 
-    protected $fillable = ['parent_id','titulo'];
+    protected $fillable = ['parent_id','titulo', 'bloqueado'];
 
     public function caracteristicas(){
         return $this->belongsToMany(Caracteristica::class, 'finalidade_caracteristicas', 'finalidade_id', 'caracteristica_id');
