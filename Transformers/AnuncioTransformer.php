@@ -52,6 +52,8 @@ class AnuncioTransformer extends TransformerAbstract
             'telefone' => (string)!is_null($model->telefone) ? "({$model->telefone->ddd}) {$model->telefone->numero}" : null,
             'valor' => (double)$model->valor,
             'valor_condominio' => (double)$model->valor_condominio,
+            'iptu' => (double)$model->iptu,
+            'valor_condominio_isento' => (boolean)$model->valor_condominio_isento,
             'observacao' => (string)$model->observacao,
             'houvecontratacao' => (boolean)($model->houvecontratacao->count() > 0) ? true : false,
             'caracteristica_extra' => (string)$model->caracteristica_extra,

@@ -53,6 +53,8 @@ class Anuncio extends Model implements Transformable
         'longitude',
         'tipo',
 
+        'iptu',
+        'valor_condominio_isento',
         'area_util',
         'area_total',
         'qtde_dormitorio',

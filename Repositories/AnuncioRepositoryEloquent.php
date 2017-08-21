@@ -167,6 +167,10 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
         try {
             unset($data['endereco']['cidade_name']);
             unset($data['endereco']['estado_name']);
+            unset($data['endereco']['cidade']);
+            unset($data['endereco']['estado']);
+            unset($data['endereco']['bairro']);
+            unset($data['endereco']['estado_uf']);
             $anuncio = $this->model->findOrFail($id);
             $anuncio->fill($data);
             if ($anuncio->isDirty('valor') || $anuncio->isDirty('valor_condominio')) {

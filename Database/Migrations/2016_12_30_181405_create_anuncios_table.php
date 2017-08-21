@@ -23,6 +23,7 @@ class CreateAnunciosTable extends Migration
             $table->foreign('finalidade_id')->references('id')->on('finalidades');
             $table->decimal('valor', 15, 2);
             $table->decimal('valor_condominio', 15, 2)->nullable();
+            $table->decimal('iptu', 15, 2)->detault(0);
             $table->enum('pretensao', ['Alugar', 'Vender', 'Revender', 'Lancamento']);
             $table->string('codigo')->unique()->nullable();
             $table->text('descricao');
@@ -71,6 +72,7 @@ class CreateAnunciosTable extends Migration
             $table->enum('situacao', ['na-planta', 'em-obras', 'pronto'])->nullable();
             $table->enum('tipo', ['imovel', 'empreendimento']);
             $table->boolean('status');
+            $table->boolean('valor_condominio_isento')->default(true);
             $table->boolean('score')->default(0);
             $table->softDeletes();
             $table->timestamps();
