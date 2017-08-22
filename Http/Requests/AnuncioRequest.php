@@ -66,9 +66,9 @@ class AnuncioRequest extends FormRequest
             'anuncio_condicao_comercial.valor_mensal' => 'numeric|min:0',
             'anuncio_condicao_comercial.valor_entrada' => 'numeric|min:0',
 
-            'caracteristicas' => 'array',
+            'caracteristicas' => 'array|nullable',
 
-            'telefones' => 'required|array',
+            'telefones' => 'array|nullable',
             'telefones.ddd.*' => 'integer|required_if:telefones,array|min:0',
             'telefones.numero.*' => 'max:255|required_if:telefones,array',
             'telefones.principal.*' => 'boolean',
@@ -77,7 +77,7 @@ class AnuncioRequest extends FormRequest
 
         if ($id) {
             $rules = array_merge($rules, [
-                'telefones.id.*' => 'required|integer'
+                'telefones.id.*' => 'integer|required_if:telefones,array'
             ]);
         }
 
