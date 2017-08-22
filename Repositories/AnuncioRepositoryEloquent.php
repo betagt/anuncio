@@ -82,7 +82,7 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
             $item->slug = str_slug($item->tipo . ' ' .
                 (($item->finalidade) ? $item->finalidade->titulo : '') . ' ' .
                 $item->pretensao . ' ' .
-                $item->qtde_dormitorio . ' quartos ' .
+                (($item->qtde_dormitorio == 0)?'':$item->qtde_dormitorio)  . ' quartos ' .
                 $item->area_util . ' m2 n' .
                 $item->id . ' ' .
                 (($item->endereco) ? $item->endereco->endereco : '') . ' ' .
@@ -187,22 +187,21 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
                 $anuncio->caracteristicas()->sync($data['caracteristicas']);
 
             if (isset($data['telefones'])) {
-                if(!isset($data['telefones']['data'])) {
-                    foreach ($data['telefones']['ddd'] as $key => $ddd) {
-                        Telefone::where('id', $data['telefones']['id'][$key])
-                            ->update([
-                                'ddd' => $ddd,
-                                'numero' => $data['telefones']['numero'][$key],
-                                'principal' => $data['telefones']['principal'][$key],
-                                'tipo' => $data['telefones']['tipo'][$key],
-                            ]);
-                        /*$anuncio->telefones()->create([
-                            'ddd'=>$ddd,
-                            'numero'=>$data['telefones']['numero'][$key],
-                            'principal'=>$data['telefones']['principal'][$key],
-                            'tipo'=>$data['telefones']['tipo'][$key],
-                        ]);*/
-                    }
+                if(isset($data['telefones']['data']))
+                foreach ($data['telefones']['ddd'] as $key => $ddd) {
+                    Telefone::where('id', $data['telefones']['id'][$key])
+                        ->update([
+                            'ddd' => $ddd,
+                            'numero' => $data['telefones']['numero'][$key],
+                            'principal' => $data['telefones']['principal'][$key],
+                            'tipo' => $data['telefones']['tipo'][$key],
+                        ]);
+                    /*$anuncio->telefones()->create([
+                        'ddd'=>$ddd,
+                        'numero'=>$data['telefones']['numero'][$key],
+                        'principal'=>$data['telefones']['principal'][$key],
+                        'tipo'=>$data['telefones']['tipo'][$key],
+                    ]);*/
                 }
             }
 
