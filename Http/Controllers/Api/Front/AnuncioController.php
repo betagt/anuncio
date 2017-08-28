@@ -296,7 +296,7 @@ class AnuncioController extends BaseController
             $data = $request->all();
             if (!is_null($data))
                 $cacheId = base64_encode(json_encode($data).$cacheId);
-            $this->cacheService->forget($cacheId);
+            //$this->cacheService->forget($cacheId);
             if (!$this->cacheService->has($cacheId)) {
                 $this->cacheService->put($cacheId,
                     $this->anuncioRepository
