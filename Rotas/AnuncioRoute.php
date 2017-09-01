@@ -99,6 +99,10 @@ class AnuncioRoute implements ICustomRoute
                     'as' => 'user.api_anuncio_imagem',
                     'uses' => 'AnuncioController@salvarImagem',
                 ]);
+                Route::post('anuncio/imagem64/{id}', [
+                    'as' => 'user.api_anuncio_imagem',
+                    'uses' => 'AnuncioController@salvarImagem64',
+                ]);
 
                 Route::delete('anuncio/imagem/destroy-image/{id}', [
                     'as' => 'user.api_anuncio_imagem_reordenar',

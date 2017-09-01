@@ -324,7 +324,7 @@ class AnuncioController extends BaseController
         \Validator::make($data, [
             'imagem' => 'array|max:10',
             'max_imagens' => "count:10," . Anuncio::class,
-            'anuncio' => '|exists:anuncios,id',
+            'anuncio' => 'exists:anuncios,id',
             'imagem.*' => [
                 'required',
                 'image',
@@ -332,6 +332,53 @@ class AnuncioController extends BaseController
             ]
         ])->validate();
 
+        $anuncio = $this->anuncioRepository->skipPresenter(true)->find($id);
+        if ($anuncio->user_id != $this->getUserId()) {
+            throw new \Exception('Anuncios não encontrado!' . $this->getUserId());
+        }
+        $result = [];
+        foreach ($data['imagem'] as $key => $img) {
+            $aux = ['imagem' => $img];
+            $this->imageUploadService->upload('imagem', $this->getPathFile(), $aux);
+            $filemake = explode('.', $aux['imagem']);
+            $imagem_list = Imagem::$tamanhos;
+            foreach ($imagem_list['anuncio'] as $index => $item) {
+                $this->imageUploadService->cropPhoto('arquivos/img/anuncio/' . $aux['imagem'], array(
+                    'width' => $item['w'],
+                    'height' => $item['h'],
+                    'grayscale' => false
+                ), 'arquivos/img/anuncio/' . $filemake[0] . '_' . $index . '.' . $filemake[1]);
+            }
+            $imagem = $this->imagemRepository->create([
+                'img' => $aux['imagem'],
+                'imagemtable_id' => $id,
+                'imagemtable_type' => Anuncio::class,
+                'princial' => false,
+                'prioridade' => $key + 1
+            ]);
+            $result['data'][$key] = $imagem['data'];
+            $result['data'][$key]['img'] = \URL::to('/') . '/arquivos/img/anuncio/' . $filemake[0] . '_img_230_160.' . $filemake[1];
+        }
+        return $result;
+
+    }
+
+    public function salvarImagem64(Request $request, $id)
+    {
+        $request->merge(['max_imagens' => $id]);
+        $request->merge(['anuncio' => $id]);
+        $data = $request->all();
+        \Validator::make($data, [
+            'imagem' => 'array|max:10',
+            'max_imagens' => "count:10," . Anuncio::class,
+            'anuncio' => 'exists:anuncios,id',
+            'imagem.*' => [
+                'required',
+                //'image',
+                //'mimes:jpg,jpeg,bmp,png'
+            ]
+        ])->validate();
+        //dd($this->base64_to_jpeg($data['imagem'][0], 'tetete'));
         $anuncio = $this->anuncioRepository->skipPresenter(true)->find($id);
         if ($anuncio->user_id != $this->getUserId()) {
             throw new \Exception('Anuncios não encontrado!' . $this->getUserId());
