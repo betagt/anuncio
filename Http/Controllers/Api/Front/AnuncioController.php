@@ -368,17 +368,27 @@ class AnuncioController extends BaseController
         $request->merge(['max_imagens' => $id]);
         $request->merge(['anuncio' => $id]);
         $data = $request->all();
+        /*\Validator::extend('is_jpg',function($attribute, $value, $params, $validator) {
+            $itens = explode(',', $value);
+            if(!is_array($itens)){
+                return false;
+            }
+            $image = base64_decode($itens[1]);
+            $f = finfo_open();
+            $result = finfo_buffer($f, $image, FILEINFO_MIME_TYPE);
+            return $result == 'image/jpeg';
+        });*/
         \Validator::make($data, [
             'imagem' => 'array|max:10',
             'max_imagens' => "count:10," . Anuncio::class,
             'anuncio' => 'exists:anuncios,id',
             'imagem.*' => [
                 'required',
+                //'is_jpg',
                 //'image',
                 //'mimes:jpg,jpeg,bmp,png'
             ]
         ])->validate();
-        //dd($this->base64_to_jpeg($data['imagem'][0], 'tetete'));
         $anuncio = $this->anuncioRepository->skipPresenter(true)->find($id);
         if ($anuncio->user_id != $this->getUserId()) {
             throw new \Exception('Anuncios não encontrado!' . $this->getUserId());
@@ -386,15 +396,15 @@ class AnuncioController extends BaseController
         $result = [];
         foreach ($data['imagem'] as $key => $img) {
             $aux = ['imagem' => $img];
-            $this->imageUploadService->upload('imagem', $this->getPathFile(), $aux);
+            $this->imageUploadService->upload64('imagem', $this->getPathFile(), $aux);
             $filemake = explode('.', $aux['imagem']);
             $imagem_list = Imagem::$tamanhos;
             foreach ($imagem_list['anuncio'] as $index => $item) {
-                $this->imageUploadService->cropPhoto('arquivos/img/anuncio/' . $aux['imagem'], array(
+                $this->imageUploadService->cropPhoto($this->getPathFile().'/' . $aux['imagem'], array(
                     'width' => $item['w'],
                     'height' => $item['h'],
                     'grayscale' => false
-                ), 'arquivos/img/anuncio/' . $filemake[0] . '_' . $index . '.' . $filemake[1]);
+                ), $this->getPathFile() .'/' . $filemake[0] . '_' . $index . '.' . $filemake[1]);
             }
             $imagem = $this->imagemRepository->create([
                 'img' => $aux['imagem'],
