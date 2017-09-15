@@ -1,6 +1,7 @@
 {
     "name": "betagt/anuncio",
-	"type": "laravel-module",
+    "license": "MIT",
+    "type": "laravel-module",
     "description": "",
 	"config": {
         "vendor-dir": "Modules"
