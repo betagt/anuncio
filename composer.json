@@ -1,0 +1,20 @@
+{
+    "name": "betagt/anuncio",
+    "license": "MIT",
+    "type": "laravel-module",
+    "description": "",
+	"config": {
+        "vendor-dir": "Modules"
+    },
+    "authors": [
+        {
+            "name": "Diuliano Oliveira",
+            "email": "diuliano0@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Modules\\Anuncio\\": ""
+        }
+    }
+}

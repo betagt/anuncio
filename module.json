@@ -1,0 +1,16 @@
+{
+    "name": "Anuncio",
+    "alias": "anuncio",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Anuncio\\Providers\\AnuncioServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}
