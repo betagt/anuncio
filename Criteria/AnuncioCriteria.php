@@ -15,6 +15,7 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 class AnuncioCriteria extends BaseCriteria implements CriteriaInterface
 {
+	
     protected $filterCriteria = [
         'anuncios.id' => '=',
         'anuncios.codigo' => '=',
