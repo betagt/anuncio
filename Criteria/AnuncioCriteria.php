@@ -55,6 +55,7 @@ class AnuncioCriteria extends BaseCriteria implements CriteriaInterface
         'cidades.titulo' => 'ilike',
         'estados.titulo' => 'ilike',
         'estados.uf' => 'ilike',
+		'anuncios.novo' => '=',
         'finalidades.titulo' => 'ilike',
     ];
 
@@ -87,6 +88,7 @@ class AnuncioCriteria extends BaseCriteria implements CriteriaInterface
 
     public function apply($model, RepositoryInterface $repository)
     {
+
         $model = parent::apply($model, $repository);
         return $model
             ->join('enderecos', function ($join) {
@@ -100,6 +102,9 @@ class AnuncioCriteria extends BaseCriteria implements CriteriaInterface
             ->leftJoin('bairros', 'enderecos.bairro_id', 'bairros.id')
             ->leftJoin('anuncio_caracteristicas', 'anuncios.id', 'anuncio_caracteristicas.anuncio_id')
             ->leftJoin('caracteristicas', 'caracteristicas.id', 'anuncio_caracteristicas.caracteristica_id')
-            ->select(array_merge($this->defaultTable));
+			->groupby('anuncios.id')
+			->select(array_merge($this->defaultTable))
+			->distinct();
+
     }
 }
