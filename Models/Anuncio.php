@@ -24,12 +24,13 @@ class Anuncio extends Model implements Transformable
 
     const TYPE_ANUNCIO_IMOVEL = 'imovel';
     const TYPE_ANUNCIO_EMPREENDIMENTO = 'empreendimento';
+    const TYPE_LANCAMENTO = 'Lancamento';
 
     const STATUS_ATIVO = true;
     const STATUS_INATIVO = false;
 
     public static $pretencao = [
-      'Alugar', 'Vender', 'Revender'
+      'Alugar', 'Vender', 'Revender', 'Lancamento'
     ];
     public static function boot()
     {
@@ -85,7 +86,10 @@ class Anuncio extends Model implements Transformable
         'status',
         'remove_site_view',
         'anuncio_mapa_confirm',
-        'video'
+        'video',
+        'banner',
+        'novo',
+        'valor_promocional',
     ];
     public function getSlugAttribute($value){
         if(is_null($value)){

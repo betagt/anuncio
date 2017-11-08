@@ -121,7 +121,7 @@ class AnuncioService
         //$this->cepService->requestCepByGeoLocation(-10.1848934,-48.3268008);
         $cidadeEstado = $localizacao['city'] . ' - ' . $localizacao['region'];
         $cacheId = base64_encode($cidadeEstado);
-        $this->cacheService->forget($cacheId);
+        //$this->cacheService->forget($cacheId);
         if ($this->cacheService->has($cacheId)) {
             return $this->cacheService->get($cacheId);
         }
@@ -135,6 +135,7 @@ class AnuncioService
         }
         $options['vitrineImoveisAlugar'] = $this->anuncioRepository->limitByPretensao(Anuncio::TYPE_ALUGAR, $query, 8);
         $options['vitrineImoveisComprar'] = $this->anuncioRepository->limitByPretensao(Anuncio::TYPE_VENDER, $query, 6);
+        $options['vitrineEmpreendimentos'] = $this->anuncioRepository->limitByPretensao(Anuncio::TYPE_LANCAMENTO, $query, 6);
         $options['ultimosAnuncios'] = $this->anuncioRepository->ultimosBylimit($query, 8);
         $options['localidade'] = $cidadeEstado;
         $this->cacheService->put($cacheId, $options, 30);

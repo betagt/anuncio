@@ -32,6 +32,8 @@ use Modules\Anuncio\Repositories\AnuncioTelefoneRepository;
 use Modules\Anuncio\Repositories\AnuncioTelefoneRepositoryEloquent;
 use Modules\Anuncio\Repositories\CaracteristicaRepository;
 use Modules\Anuncio\Repositories\CaracteristicaRepositoryEloquent;
+use Modules\Anuncio\Repositories\DenunciaRepository;
+use Modules\Anuncio\Repositories\DenunciaRepositoryEloquent;
 use Modules\Anuncio\Repositories\FavoritoRepository;
 use Modules\Anuncio\Repositories\FavoritoRepositoryEloquent;
 use Modules\Anuncio\Repositories\FinalidadeCaracteristicaRepository;
@@ -120,6 +122,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             AnuncioExcluirFormRepository::class,
             AnuncioExcluirFormRepositoryEloquent::class
+        );
+        $this->app->bind(
+            DenunciaRepository::class,
+            DenunciaRepositoryEloquent::class
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace Modules\Anuncio\Http\Controllers\Api\Admin;
 
 use Modules\Anuncio\Models\Anuncio;
+use Portal\Models\Imagem;
 use Portal\Repositories\ImagemRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -67,7 +68,9 @@ class AnuncioController extends BaseController
         $data = $request->all();
         \Validator::make($data, $this->getValidator())->validate();
         try {
-            //event(new AnuncioCadastrado($this->anuncioRepository->skipPresenter(true)->find($anuncio['data']['id'])));
+            $aux = ['banner' => $data['banner']];
+            $this->imageUploadService->upload64('banner', $this->getPathFile(), $aux);
+            $data['banner'] = $aux['banner'];
             return $this->anuncioRepository->createByEnderecoPreco($data);
         } catch (ModelNotFoundException $e) {
             return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code' => $e->getCode(), 'message' => $e->getMessage()]));
@@ -95,6 +98,13 @@ class AnuncioController extends BaseController
         $data = $request->all();
         \Validator::make($data, $this->getValidator($id, $data['tipo']))->validate();
         try {
+            if(preg_match('/(base64)/', $data['banner'])){
+                $aux = ['banner' => $data['banner']];
+                $this->imageUploadService->upload64('banner', $this->getPathFile(), $aux);
+                $data['banner'] = $aux['banner'];
+            }else{
+                unset($data['banner']);
+            }
             return $this->anuncioRepository->updateByEnderecoPreco($data, $id);
         } catch (ModelNotFoundException $e) {
             return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code' => $e->getCode(), 'message' => $e->getMessage()]));
@@ -134,10 +144,12 @@ class AnuncioController extends BaseController
     public function salvarImagem(Request $request, $id)
     {
         $request->merge(['max_imagens' => $id]);
+        $request->merge(['anuncio' => $id]);
         $data = $request->all();
         \Validator::make($data, [
-            'imagem'=>'array|max:10',
-            'max_imagens'=>"count:10,".Anuncio::class,
+            'imagem' => 'array|max:10',
+            'max_imagens' => "count:10," . Anuncio::class,
+            'anuncio' => 'exists:anuncios,id',
             'imagem.*' => [
                 'required',
                 'image',
@@ -146,29 +158,33 @@ class AnuncioController extends BaseController
         ])->validate();
         try {
             $result = [];
-            foreach ($data['imagem'] as $key => $img) {
-                $aux = ['imagem' => $img];
-                $this->imageUploadService->upload('imagem', $this->getPathFile(), $aux);
-                $filemake = explode('.', $aux['imagem']);
-                $imagem_list = Imagem::$tamanhos;
-                foreach ($imagem_list['anuncio'] as $index => $item) {
-                    $this->imageUploadService->cropPhoto('arquivos/img/anuncio/'.$aux['imagem'], array(
-                        'width' => $item['w'],
-                        'height' => $item['h'],
-                        'grayscale' => false
-                    ), 'arquivos/img/anuncio/' . $filemake[0] . '_' . $index . '.' . $filemake[1]);
+            if(isset($data['imagem'])) {
+                foreach ($data['imagem'] as $key => $img) {
+                    $aux = ['imagem' => $img];
+                    $this->imageUploadService->upload('imagem', $this->getPathFile(), $aux);
+                    $filemake = explode('.', $aux['imagem']);
+                    $imagem_list = Imagem::$tamanhos;
+                    foreach ($imagem_list['anuncio'] as $index => $item) {
+                        $this->imageUploadService->cropPhoto('arquivos/img/anuncio/' . $aux['imagem'], array(
+                            'width' => $item['w'],
+                            'height' => $item['h'],
+                            'grayscale' => false
+                        ), 'arquivos/img/anuncio/' . $filemake[0] . '_' . $index . '.' . $filemake[1]);
+                    }
+                    $imagem = $this->imagemRepository->create([
+                        'img' => $aux['imagem'],
+                        'imagemtable_id' => $id,
+                        'imagemtable_type' => Anuncio::class,
+                        'princial' => false,
+                        'prioridade' => $key + 1
+                    ]);
+                    $result['data'][$key] = $imagem['data'];
+                    $result['data'][$key]['img'] = \URL::to('/') . '/arquivos/img/anuncio/' . $filemake[0] . '_img_230_160.' . $filemake[1];
                 }
-                $imagem = $this->imagemRepository->create([
-                    'img' => $aux['imagem'],
-                    'imagemtable_id' => $id,
-                    'imagemtable_type' => Anuncio::class,
-                    'princial' => false,
-                    'prioridade' => $key + 1
-                ]);
-                $result['data'][$key] = $imagem['data'];
-                $result['data'][$key]['img'] =  \URL::to('/') .'/arquivos/img/anuncio/'.$filemake[0] . '_img_230_160.' . $filemake[1];
+                return $result;
+            }else{
+                throw new \Exception('imagem não encontrada!');
             }
-            return $result;
         } catch (ModelNotFoundException $e) {
             return parent::responseError(parent::HTTP_CODE_NOT_FOUND, $e->getMessage());
         } catch (\Exception $e) {

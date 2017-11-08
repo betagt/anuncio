@@ -44,6 +44,7 @@ class AnuncioTransformer extends TransformerAbstract
             'pretensao' => (string)$model->pretensao,
             'slug' => (string)$model->slug,
             'imagem_principal' => $model->imagemPrincipal(),
+            'banner' => ($model->banner) ? \URL::to('/') . '/arquivos/img/anuncio/' . $model->banner : null,
             'codigo' => (string)$model->codigo,
             'descricao' => (string)$model->descricao,
             'ano_construcao' => (int)$model->ano_construcao,
@@ -77,7 +78,7 @@ class AnuncioTransformer extends TransformerAbstract
             'qtde_elevador' => (int)$model->qtde_elevador,
             'qtde_unidade_andar' => (int)$model->qtde_unidade_andar,
             'anuncio_mapa_confirm' => (boolean)$model->anuncio_mapa_confirm,
-            'situacao' => (string)$model->situacao,
+            'situacao' => (string) $model->situacao,
 
             'area_util' => (float)$model->area_util,
             'area_total' => (float)$model->area_total,
@@ -95,7 +96,9 @@ class AnuncioTransformer extends TransformerAbstract
 
             'created_at' => $model->created_at,
             'updated_at' => $model->updated_at,
-            'status' => (boolean)$model->status
+            'status' => (boolean)$model->status,
+            'novo' => (boolean)$model->novo,
+            'valor_promocional' => (float)$model->valor_promocional,
         ];
 
         if ($contratacao) {

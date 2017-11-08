@@ -67,8 +67,9 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
                     ]);
                 }
             }
+            $result = $this->parserResult($this->generateSlug($this->model->find($anuncio->id)));
             \DB::commit();
-            return $this->parserResult($this->generateSlug($this->model->find($anuncio->id)));
+            return $result;
         } catch (\Exception $e) {
             \DB::rollback();
             return $e->getMessage();
@@ -77,7 +78,6 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
 
     private function generateSlug($item)
     {
-
         if ($item->tipo == Anuncio::TYPE_ANUNCIO_IMOVEL) {
             $item->slug = str_slug($item->tipo . ' ' .
                 (($item->finalidade) ? $item->finalidade->titulo : '') . ' ' .
@@ -93,9 +93,9 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
             $item->slug = str_slug(
                 $item->tipo . ' ' .
                 $item->pretensao . ' ' .
-                (($item->endereco) ? $item->estado->uf : '') . ' ' .
-                (($item->endereco) ? $item->cidade->titulo : '') . ' ' .
-                (($item->endereco) ? $item->bairro->titulo : '') . ' ' .
+                (($item->endereco) ? $item->endereco->estado->uf : '') . ' ' .
+                (($item->endereco) ? $item->endereco->cidade->titulo : '') . ' ' .
+                (($item->endereco) ? $item->endereco->bairro->titulo : '') . ' ' .
                 (($item->endereco) ? $item->endereco->endereco : '') . ' ' .
                 $item->titulo .
                 (($item->qtde_area_minimo) ? $item->qtde_area_minimo . ' m2 ' : '') .
@@ -134,7 +134,6 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
             $scope = $scope
                 ->where('anuncios.pretensao', '=', $pretensao)
                 ->where('anuncios.status', '=', true)
-                ->limit($limit)
                 ->orderBy('score', 'desc')
                 ->leftJoin('enderecos', function ($join) {
                     $join->on('anuncios.id', '=', 'enderecos.enderecotable_id');
@@ -142,6 +141,7 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
                 })
                 ->leftJoin('cidades', 'enderecos.cidade_id', 'cidades.id')
                 ->leftJoin('estados', 'enderecos.estado_id', 'estados.id')
+                ->limit($limit)
                 ->select(['anuncios.*']);
             $this->queryBuilder($scope, $query);
             return $scope;
@@ -254,5 +254,10 @@ class AnuncioRepositoryEloquent extends BaseRepository implements AnuncioReposit
             return null;
         }
         return $this->skipPresenter(false)->parserResult($anuncio->first());
+    }
+
+    public function contagemAnunciosFree($userId)
+    {
+        $this->withCount();
     }
 }

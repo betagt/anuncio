@@ -71,10 +71,11 @@ class FinalidadeController extends BaseController
     public function getList()
     {
         try {
+            $this->cacheService->forget('todas_finalidades');
             if ($this->cacheService->has('todas_finalidades')) {
                 return $this->cacheService->get('todas_finalidades');
             }
-            $data = $this->finalidadeRepository->findWhere(['parent_id' => null]);
+            $data = $this->finalidadeRepository->orderBy('titulo')->findWhere(['parent_id' => null]);
             $this->cacheService->put('todas_finalidades', $data, 15);
             return $data;
         } catch (ModelNotFoundException $e) {

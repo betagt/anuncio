@@ -16,4 +16,5 @@ interface AnuncioRepository extends RepositoryInterface
     public function findByUser($id, $userId=null);
     public function limitByPretensao ($pretencao,array $query, $limit);
     public function ultimosBylimit (array $query, $limit);
+    public function contagemAnunciosFree($userId);
 }

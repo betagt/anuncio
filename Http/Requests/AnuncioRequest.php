@@ -105,6 +105,7 @@ class AnuncioRequest extends FormRequest
                 'titulo' => 'required|max:255',
                 'titulo_reduzido' => 'required|max:255',
                 'subtitulo' => 'required|max:255',
+                'banner' => 'required',
                 'descricao_curta' => 'required|max:500',
                 'qtde_area_maximo' => 'required|numeric|min:0',
                 'qtde_area_minimo' => 'required|numeric|different:qtde_area_maximo|min:0',
