@@ -7,6 +7,7 @@
  */
 
 namespace Modules\Anuncio\Rotas;
+use Portal\Http\Middleware\CacheMiddleware;
 use Portal\Interfaces\ICustomRoute;
 use \Route;
 
@@ -23,6 +24,11 @@ class AnuncioRoute implements ICustomRoute
             Route::get('anuncio/imagens/{id}', [
                 'as' => 'user.api_anuncio_imagens',
                 'uses' => 'AnuncioController@imagensByAnuncios',
+            ]);
+
+            Route::get('anuncio/metricas', [
+                'as' => 'user.api_anuncio_imagens',
+                'uses' => 'AnuncioController@statisticas',
             ]);
 
             Route::post('anuncio/imagem/reordenar', [
@@ -51,8 +57,11 @@ class AnuncioRoute implements ICustomRoute
             Route::get('anuncio/lista-anuncios', [
                 'as' => 'user.api_anuncio_suspender',
                 'uses' => 'AnuncioController@listSite',
-            ]);
-
+            ]);//->middleware(CacheMiddleware::class);
+			Route::get('anuncio/ofertas-capa', [
+				'as' => 'user.api_anuncio_suspender',
+				'uses' => 'AnuncioController@ofertasCapa',
+			])->middleware(CacheMiddleware::class);
             Route::get('anuncio/visualizar/{slug}', [
                 'as' => 'user.api_anuncio_suspender',
                 'uses' => 'AnuncioController@vizualizar',
@@ -81,10 +90,6 @@ class AnuncioRoute implements ICustomRoute
             Route::get('anuncio/score-compartilhar/{id}', [
                 'as' => 'user.api_anuncio_suspender',
                 'uses' => 'AnuncioController@scoreCompartilhar',
-            ]);
-            Route::get('anuncio/ofertas-capa', [
-                'as' => 'user.api_anuncio_suspender',
-                'uses' => 'AnuncioController@ofertasCapa',
             ]);
             Route::group(['middleware'=>['acl','auth:api'],'is'=>'administrador|anunciante|moderator|qative','protect_alias'=>'user'],function (){
                 Route::post('anuncio/imagem/reordenar', [

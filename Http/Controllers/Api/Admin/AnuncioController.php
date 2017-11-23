@@ -2,7 +2,9 @@
 
 namespace Modules\Anuncio\Http\Controllers\Api\Admin;
 
+use Modules\Anuncio\Criteria\PesquisaCriteria;
 use Modules\Anuncio\Models\Anuncio;
+use Modules\Anuncio\Repositories\LogPesquisaRepository;
 use Portal\Models\Imagem;
 use Portal\Repositories\ImagemRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -38,9 +40,14 @@ class AnuncioController extends BaseController
      * @var ImagemRepository
      */
     private $imagemRepository;
+	/**
+	 * @var LogPesquisaRepository
+	 */
+	private $logPesquisaRepository;
 
-    public function __construct(
+	public function __construct(
         AnuncioRepository $anuncioRepository,
+		LogPesquisaRepository $logPesquisaRepository,
         AnuncioService $anuncioService,
         ImageUploadService $imageUploadService,
         ImagemRepository $imagemRepository)
@@ -51,7 +58,8 @@ class AnuncioController extends BaseController
         $this->anuncioService = $anuncioService;
         $this->imageUploadService = $imageUploadService;
         $this->imagemRepository = $imagemRepository;
-    }
+		$this->logPesquisaRepository = $logPesquisaRepository;
+	}
 
     /**
      * @return array
@@ -244,4 +252,21 @@ class AnuncioController extends BaseController
             return parent::responseError(parent::HTTP_CODE_BAD_REQUEST, $e->getMessage());
         }
     }
+
+	public function statisticas(Request $request){
+		try{
+			return $this->logPesquisaRepository
+				->pushCriteria(new PesquisaCriteria($request))
+				->pushCriteria(new OrderCriteria($request))
+				->paginate(self::$_PAGINATION_COUNT, ['pesquisa','count']);
+		}catch (ModelNotFoundException $e){
+			return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code'=>$e->getCode(),'message'=>$e->getMessage()]));
+		}
+		catch (RepositoryException $e){
+			return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code'=>$e->getCode(),'message'=>$e->getMessage()]));
+		}
+		catch (\Exception $e){
+			return self::responseError(self::HTTP_CODE_BAD_REQUEST, trans('errors.undefined', ['status_code'=>$e->getCode(),'message'=>$e->getMessage()]));
+		}
+	}
 }

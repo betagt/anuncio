@@ -194,4 +194,8 @@ class AnuncioService
 
     }
 
+    public function logPesquisa(){
+
+	}
+
 }

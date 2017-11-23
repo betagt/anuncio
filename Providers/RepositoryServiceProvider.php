@@ -40,6 +40,8 @@ use Modules\Anuncio\Repositories\FinalidadeCaracteristicaRepository;
 use Modules\Anuncio\Repositories\FinalidadeCaracteristicaRepositoryEloquent;
 use Modules\Anuncio\Repositories\FinalidadeRepository;
 use Modules\Anuncio\Repositories\FinalidadeRepositoryEloquent;
+use Modules\Anuncio\Repositories\LogPesquisaRepository;
+use Modules\Anuncio\Repositories\LogPesquisaRepositoryEloquent;
 use Modules\Anuncio\Repositories\MensagemAnuncioRepository;
 use Modules\Anuncio\Repositories\MensagemAnuncioRepositoryEloquent;
 use Modules\Anuncio\Repositories\ScoreRepository;
@@ -126,6 +128,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             DenunciaRepository::class,
             DenunciaRepositoryEloquent::class
+        );
+        $this->app->bind(
+            LogPesquisaRepository::class,
+			LogPesquisaRepositoryEloquent::class
         );
     }
 }

@@ -7,6 +7,7 @@
  */
 
 namespace Modules\Anuncio\Rotas;
+use Portal\Http\Middleware\CacheMiddleware;
 use Portal\Interfaces\ICustomRoute;
 use \Route;
 
@@ -31,7 +32,7 @@ class FinalidadeRoute implements ICustomRoute
             Route::get('finalidade/lista', [
                 'as' => 'user.api_finalidade_lista',
                 'uses' => 'FinalidadeController@getList',
-            ]);
+            ])->middleware(CacheMiddleware::class);
             Route::group(['middleware'=>['acl','auth:api'],'is'=>'administrador','protect_alias'=>'user'],function (){
                 Route::get('finalidade/select-finalidade', [
                     'as' => 'plano.consulta_bairros',

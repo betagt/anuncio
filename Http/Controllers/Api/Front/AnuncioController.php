@@ -12,6 +12,7 @@ use Modules\Anuncio\Models\Anuncio;
 use Modules\Anuncio\Models\Score;
 use Modules\Anuncio\Repositories\AnuncioExcluirFormRepository;
 use Modules\Anuncio\Repositories\AnuncioFrontRepository;
+use Modules\Anuncio\Repositories\LogPesquisaRepository;
 use Modules\Core\Services\ImageUploadService;
 use Portal\Criteria\OrderCriteria;
 use Portal\Http\Controllers\BaseController;
@@ -51,10 +52,15 @@ class AnuncioController extends BaseController
      * @var AnuncioExcluirFormRepository
      */
     private $anuncioExcluirFormRepository;
+	/**
+	 * @var LogPesquisaRepository
+	 */
+	private $logPesquisaRepository;
 
-    public function __construct(
+	public function __construct(
         AnuncioFrontRepository $anuncioRepository,
         AnuncioService $anuncioService,
+        LogPesquisaRepository $logPesquisaRepository,
         CacheService $cacheService,
         ImageUploadService $imageUploadService,
         ImagemRepository $imagemRepository,
@@ -68,7 +74,8 @@ class AnuncioController extends BaseController
         $this->imageUploadService = $imageUploadService;
         $this->imagemRepository = $imagemRepository;
         $this->anuncioExcluirFormRepository = $anuncioExcluirFormRepository;
-    }
+		$this->logPesquisaRepository = $logPesquisaRepository;
+	}
 
     /**
      * @return array
@@ -252,6 +259,7 @@ class AnuncioController extends BaseController
         $this->anuncioService->bloqueioDeScore(Score::LABEL_COMPARTILHAR, $this->getUserId(), $id, self::TIME_CACHE);
     }
 
+
     /**
      * Consulta  por ID
      *
@@ -290,30 +298,33 @@ class AnuncioController extends BaseController
      *   <br> - ?consulta={"filtro": {"estados.uf": "TO", "cidades.titulo" : "Palmas"}}
      */
     public function listSite(Request $request)
-    {
-        try {
-            $cacheId = '1' . $request->get('page');
-            $data = $request->all();
-            if (!is_null($data))
-                $cacheId = base64_encode(json_encode($data).$cacheId);
-            //$this->cacheService->forget($cacheId);
-            if (!$this->cacheService->has($cacheId)) {
-                $this->cacheService->put($cacheId,
-                    $this->anuncioRepository
-                        ->pushCriteria(new AnuncioCriteria($request))
-                        ->pushCriteria(new AnuncioStatusCriteria())
-                        ->pushCriteria(new AnuncioScoreOrderCriteria())
-                        ->pushCriteria(new OrderCriteria($request))
-                        ->paginate(self::$_PAGINATION_COUNT));
-            }
-            return $this->cacheService->get($cacheId);
+    {$cacheId = '1' . $request->get('page');
+		$data = $request->all();
+		if (!is_null($data['consulta'])) {
+			$baserequest = json_encode($data['consulta']);
+			$this->logPesquisaRepository->create(['pesquisa'=>$baserequest]);
+			$cacheId = base64_encode( $baserequest . $cacheId);
+		}
+		//$this->cacheService->forget($cacheId);
+		if (!$this->cacheService->has($cacheId)) {
+			$this->cacheService->put($cacheId,
+				$this->anuncioRepository
+					->pushCriteria(new AnuncioCriteria($request))
+					->pushCriteria(new AnuncioStatusCriteria())
+					->pushCriteria(new AnuncioScoreOrderCriteria())
+					->pushCriteria(new OrderCriteria($request))
+					->paginate(self::$_PAGINATION_COUNT));
+		}
+		return $this->cacheService->get($cacheId);
+       /* try {
+
         } catch (ModelNotFoundException $e) {
             return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code' => $e->getCode(), 'message' => $e->getMessage()]));
         } catch (RepositoryException $e) {
             return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code' => $e->getCode(), 'message' => $e->getMessage()]));
         } catch (\Exception $e) {
             return self::responseError(self::HTTP_CODE_BAD_REQUEST, trans('errors.undefined', ['status_code' => $e->getCode(), 'message' => $e->getMessage()]));
-        }
+        }*/
     }
 
     public function salvarImagem(Request $request, $id)
