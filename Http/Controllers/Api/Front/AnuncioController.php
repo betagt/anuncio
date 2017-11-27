@@ -300,7 +300,7 @@ class AnuncioController extends BaseController
     public function listSite(Request $request)
     {$cacheId = '1' . $request->get('page');
 		$data = $request->all();
-		if (!is_null($data['consulta'])) {
+		if (isset($data['consulta']) && !is_null($data['consulta'])) {
 			$baserequest = json_encode($data['consulta']);
 			$this->logPesquisaRepository->create(['pesquisa'=>$baserequest]);
 			$cacheId = base64_encode( $baserequest . $cacheId);

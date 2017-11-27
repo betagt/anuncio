@@ -11,4 +11,6 @@ use Prettus\Repository\Contracts\RepositoryInterface;
 interface LogPesquisaRepository extends RepositoryInterface
 {
     public function statistica();
+
+    public function contagem();
 }

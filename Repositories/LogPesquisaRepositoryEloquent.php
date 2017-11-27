@@ -45,4 +45,9 @@ class LogPesquisaRepositoryEloquent extends BaseRepository implements LogPesquis
 	{
 
 	}
+
+	public function contagem()
+	{
+		return $this->model->count();
+	}
 }

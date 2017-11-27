@@ -70,8 +70,7 @@ class AnuncioController extends BaseController
         return $this->validator;
     }
 
-
-    public function store(Request $request)
+	public function store(Request $request)
     {
         $data = $request->all();
         \Validator::make($data, $this->getValidator())->validate();
@@ -255,10 +254,13 @@ class AnuncioController extends BaseController
 
 	public function statisticas(Request $request){
 		try{
-			return $this->logPesquisaRepository
+			$result = $this->logPesquisaRepository
 				->pushCriteria(new PesquisaCriteria($request))
 				->pushCriteria(new OrderCriteria($request))
 				->paginate(self::$_PAGINATION_COUNT, ['pesquisa','count']);
+
+			$result['meta']['contagem'] = $this->logPesquisaRepository->contagem();
+			return $result;
 		}catch (ModelNotFoundException $e){
 			return self::responseError(self::HTTP_CODE_NOT_FOUND, trans('errors.registre_not_found', ['status_code'=>$e->getCode(),'message'=>$e->getMessage()]));
 		}
